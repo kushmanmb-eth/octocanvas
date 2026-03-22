@@ -176,6 +176,47 @@ theme: {
 }
 ```
 
+## 🔐 Wallet & Crypto Address Policy
+
+All crypto asset flows, transfers, and storage within OctoCanvas are **exclusively** consolidated to the following three authorised addresses:
+
+| ENS Name               | Role                    |
+|------------------------|-------------------------|
+| `kushmanmb.eth`        | Primary owner wallet    |
+| `yaketh.eth`           | Secondary owner wallet  |
+| `kushmanmb.base.eth`   | Base-chain owner wallet |
+
+### Zero Address Protection
+
+The Ethereum zero address (`0x0000000000000000000000000000000000000000`) is **explicitly blocked** in all wallet operations.  Attempting to transfer assets to or store the zero address will throw an error.
+
+### Wallet Utilities (`src/utils/wallet.ts`)
+
+```typescript
+import {
+  ZERO_ADDRESS,
+  ALLOWED_WALLET_ADDRESSES,
+  isZeroAddress,
+  isAllowedAddress,
+  validateAddress,
+} from './src/utils/wallet';
+
+// Check for zero address
+isZeroAddress('0x0000000000000000000000000000000000000000'); // true
+
+// Check against allowed list
+isAllowedAddress('kushmanmb.eth');      // true
+isAllowedAddress('kushmanmb.base.eth'); // true
+isAllowedAddress('unknown.eth');        // false
+
+// Validate before any transfer – throws on zero address or unknown address
+validateAddress('yaketh.eth'); // OK
+validateAddress('0x0000000000000000000000000000000000000000'); // throws
+validateAddress('unknown.eth');                                 // throws
+```
+
+Any wallet, contract, or workflow code added to this project **must** call `validateAddress` before executing a transfer or persisting a wallet address.
+
 ## 🤝 Contributing
 
 Contributions are welcome! Here are some ways you can contribute:
